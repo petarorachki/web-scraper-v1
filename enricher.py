@@ -7,10 +7,10 @@ import random
 from urllib.parse import urljoin
 from playwright.async_api import async_playwright, Page
 
-INPUT_FOLDER = "Grabber_Mind"
-DIR_DEEP_DATA = "Enricher_Mind"
+INPUT_FOLDER = "Folder"
+DIR_DEEP_DATA = "OutFolder"
 PROFILE_LINK_SELECTOR = "a.row"
-JSON_FILENAME_PREFIX = "Enrich_Profile_Data"
+JSON_FILENAME_PREFIX = "Enrich_Data"
 
 HEADLESS = True  # Set to True for maximum speed
 SCROLL_PROFILE = True
