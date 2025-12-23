@@ -10,8 +10,8 @@ from urllib.parse import urljoin
 #   [1] CONFIGURATION AREA (CHANGE THIS FOR EVERY NEW SITE)
 # ==============================================================================
 
-INPUT_FOLDER = "Grabber_FindHomeo"
-OUTPUT_FILE = "GoodCVS/Extractor_FindHomeodd.csv"
+INPUT_FOLDER = "Folder1"
+OUTPUT_FILE = "GoodFiles/GoodFiles.csv"
 
 # The CSS selector for the ONE card/box that contains a single person's data
 CONTAINER_SELECTOR = "div.row"
@@ -25,32 +25,17 @@ CSV_HEADERS = [
 ]
 
 PERSON_DETAILS = {
-    "Name": ("span.memberTitle", "text"),
-
-    # Title (Naturopath) is in the next Heading Widget
-    "Title": ("div[data-id='fd37797'] h2", "text"),
-
-    # Image
+    "Name": ("#element", "text"),
+    "Title": ("#element", "text"),
     "Image_URL": ("img", "src"),
-
-    # Company ("Mr Vitamins")
-    "Company": ("div[data-id='14cdc7c']", "text"),
-
-    # Address ("394 Victoria Ave...")
-    "Address": ("div[data-id='054bd27']", "text"),
-
-    # Landline Phone
-    "Residental Tel": ("div[data-id='3db4f19']", "text"),
-
-    # Email
-    "Email": ("div[data-id='f17d03e']", "text"),
-
-    # Website (It's a link inside a Heading widget)
-    "Website": ("", ""),
-
-    "Details": ("div[data-id='5fcc990']", "text"),
-
-    "Practice": ("", ""), "Specialism": ("", "")
+    "Company": ("#element", "text"),
+    "Address": ("#element", "text"),
+    "Residental Tel": ("#element", "text"),
+    "Email": ("#element", "text"),
+    "Website": ("#element", "text"),
+    "Details": ("#element", "text"),
+    "Practice": ("#element", "text"), 
+    "Specialism": ("#element", "text")
 }
 
 LABEL_SEARCH = {
@@ -75,44 +60,29 @@ class UniversalRefinery:
     @staticmethod
     def clean(txt):
         if not txt: return ""
-        # Remove leading punctuation like ": " or "- "
         txt = re.sub(r"^[:\s\-]+", "", txt.strip())
-        # Collapse multiple spaces
         return " ".join(txt.split())
 
     @staticmethod
     def extract_by_label(soup_item, label_text):
-        """
-        Smart Extraction: Finds a label (like 'Phone:') and grabs the text
-        immediately following it, stopping at the next <br> or <b> tag.
-        This prevents mixing Phone and Email if they are in the same <p>.
-        """
-        # Find the tag containing the label text
         label_tag = soup_item.find(
             lambda tag: tag.name in ["strong", "b", "span", "em"] and label_text in tag.get_text())
 
         if not label_tag: return ""
 
         captured_text = []
-
-        # Walk through the "next siblings" (the text/tags coming after the label)
         for sibling in label_tag.next_siblings:
-            # STOP CONDITION: Hit a line break or the start of a new bold label
             if sibling.name == "br" or sibling.name == "strong" or sibling.name == "b":
                 break
 
-            # If it is just text, grab it
             if isinstance(sibling, NavigableString):
                 text_part = sibling.strip()
                 if text_part: captured_text.append(text_part)
 
-            # If it is a link (like an email <a> tag), grab the text inside
             elif isinstance(sibling, Tag):
                 captured_text.append(sibling.get_text(strip=True))
 
         final_val = " ".join(captured_text)
-
-        # Cleanup specific to Address (removing internal field names if they got grabbed)
         if label_text == "Address:":
             for junk in ["City:", "State:", "Zip Code:", "Province:", "Postal Code:", "County:"]:
                 final_val = final_val.replace(junk, "")
@@ -121,7 +91,6 @@ class UniversalRefinery:
 
     @staticmethod
     def extract_global_contacts(soup_item):
-        """Fallback: Finds any emails/phones/links inside the container if specific selectors failed."""
         email, phone, website = "", "", ""
         social_links = {s: "" for s in SOCIAL_PLATFORMS}
 
@@ -136,7 +105,6 @@ class UniversalRefinery:
                 for s in SOCIAL_PLATFORMS:
                     if s in h: social_links[s] = a['href']
             elif "http" in h or "https" in h:
-                # Basic filter to avoid junk links
                 if "w3.org" not in h and "google" not in h and "facebook" not in h:
                     if not website: website = a['href']
 
@@ -155,13 +123,10 @@ class UniversalRefinery:
                 base = packet.get("url", "")
                 soup = BeautifulSoup(html, 'lxml')
 
-                # Find all people cards
                 items = soup.select(CONTAINER_SELECTOR)
 
                 for item in items:
                     temp_row = {"Source_File": os.path.basename(f_path)}
-
-                    # --- 1. RUN CSS SELECTORS (PERSON_DETAILS) ---
                     for field, (css, attr) in PERSON_DETAILS.items():
                         if not css: continue
 
@@ -175,8 +140,6 @@ class UniversalRefinery:
                             elif el.has_attr(attr):
                                 val = el[attr]
                                 if attr == "href": val = urljoin(base, val)
-
-                                # Auto-handle background images
                                 if attr == "style" and "background-image" in val:
                                     clean_match = re.search(r"url\(['\"]?(.*?)['\"]?\)", val)
                                     if clean_match: val = clean_match.group(1)
