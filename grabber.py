@@ -9,7 +9,7 @@ from playwright.async_api import async_playwright, Page
 #   [1] TARGET & SELECTORS
 # ==========================================
 START_URLS = [
-    "https://findahomeopath.org/search/postcode?postcode=LA"
+    "url.example.com"
 ]
 
 NEXT_BTN_PATTERNS = [
@@ -43,9 +43,9 @@ PAGINATION_CHECK_RETRIES = 5
 # ==========================================
 #   [4] FOLDERS & FILES
 # ==========================================
-DIR_RAW = "Grabber_FindHomeo"
-DIR_LINKS = "Links_FindHomeo"
-FILE_LINKS = os.path.join(DIR_LINKS, "all_mind.csv")
+DIR_RAW = "Folder"
+DIR_LINKS = "Links"
+FILE_LINKS = os.path.join(DIR_LINKS, "all_links.csv")
 JSON_FILENAME = "Grab_HTML_Data"
 
 
@@ -60,13 +60,13 @@ class UniversalVacuum:
 
     @staticmethod
     async def smart_scroll_until_button(page: Page):
-        print("  [🌊] Smart Scrolling (Looking for button)...")
+        print(" Smart Scrolling (Looking for button)...")
         while True:
             found_button = False
             for selector in NEXT_BTN_PATTERNS:
                 try:
                     if await page.is_visible(selector, timeout=100):
-                        print(f"  [👀] Spotter: Found button '{selector}'! Stopping scroll.")
+                        print(f" Spotter: Found button '{selector}'! Stopping scroll.")
                         found_button = True
                         break
                 except Exception as e:
