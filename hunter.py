@@ -9,8 +9,8 @@ from urllib.parse import urljoin, urlparse
 # ==============================================================================
 # [1] PATHS & DATA CONFIGURATION
 # ==============================================================================
-INPUT_CSV = "GoodCVS/.csv"
-OUTPUT_CSV = "FinalCVS/Final_CNHC.csv"
+INPUT_CSV = "GoodCVS/GoodCVS.cvs"
+OUTPUT_CSV = "FinalCVS/FinalCVS.cvs"
 
 CSV_HEADERS = [
     "Name", "First_Name", "Last_Name",
@@ -26,8 +26,7 @@ CSV_HEADERS = [
 EMAIL_REGEX = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}'
 PHONE_REGEX = r'(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
 
-JUNK_EMAIL_PATTERNS = ['domain.com', 'example.com', 'email.com', 'yourdomain.com', 'website.com', 'sentry', 'wixpress',
-                       'jpg', 'png', 'gif']
+JUNK_EMAIL_PATTERNS = ['domain.com', 'example.com', 'email.com', 'yourdomain.com', 'website.com', 'sentry', 'wixpress', 'jpg', 'png', 'gif']
 ADDRESS_LABELS = ['Location', 'Address', 'Our Office', 'Find Us', 'Visit Us', 'Contact Details', 'Postal']
 ADDRESS_INDICATORS = ['Street', 'St.', 'Road', 'Rd', 'Ave', 'Dr', 'Lane', 'Suite', 'Floor', 'Box', 'P.O.']
 POSTAL_CODE_PATTERNS = [r'\b\d{5}(?:[-\s]\d{4})?\b', r'\b\d{4}\b', r'\b[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\b']
